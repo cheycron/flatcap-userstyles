@@ -33,7 +33,7 @@
 
 ## 🛠️ Development & Philosophy
 
-These styles follow the **[Flatcap Design System v1.1.0](https://github.com/cheycron/flatcap-theme/blob/main/GEMINI.md)** guidelines:
+These styles follow the **[Flatcap Design v1.1.0](https://github.com/cheycron/flatcap-theme)** guidelines:
 
 *   **Background:** `#121418` (Deep Twilight)
 *   **Surface:** `#191c22` (Sidebar/Panels)
