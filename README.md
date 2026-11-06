@@ -12,6 +12,19 @@
 
 <p align="center"><sub>Flatcap Slate (dark) above, Flatcap Daylight (light) below, on Reddit.</sub></p>
 
+<table>
+  <tr>
+    <td width="58%"><img src="https://raw.githubusercontent.com/cheycron/flatcap-userstyles/main/images/gmail-slate.png" alt="Flatcap Slate on the Gmail inbox: graphite sidebar and message list, labels blurred" width="100%"></td>
+    <td width="42%"><img src="https://raw.githubusercontent.com/cheycron/flatcap-userstyles/main/images/instagram-slate.png" alt="Flatcap Slate on the Instagram feed: matte dark canvas, posts and accounts blurred" width="100%"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Gmail, Slate</sub></td>
+    <td align="center"><sub>Instagram, Slate</sub></td>
+  </tr>
+</table>
+
+<p align="center"><sub>Personal data and third-party content are blurred.</sub></p>
+
 **Flatcap for Stylus** brings the Flatcap visual system to four websites through UserCSS: Gemini, Gmail, Instagram and Reddit. Matte surfaces, one mineral-blue accent, and an interface that stays in the background.
 
 Each style keeps the selectors and behaviors it already had on the site; only the colors, fonts and focus treatment changed to Flatcap 2.0. Slate and Daylight are available in every style.
