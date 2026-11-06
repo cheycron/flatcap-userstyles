@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """Generate the Flatcap 2.0 token block of the UserStyles.
 
-    python3 scripts/build.py              # rewrite the generated blocks in styles/*.user.less and README.md
+    python3 scripts/build.py              # rewrite the generated blocks in styles/*.user.less and docs/mapping.md
     python3 scripts/build.py --check      # fail if a block is stale, a hex colour sits outside it, metadata drifts, or contrast misses a target
     python3 scripts/build.py --sync       # refresh src/theme.json from ../00-Flatcap, then rebuild
     python3 scripts/build.py --contrast   # print the full contrast report
 
 Input  : src/theme.json, a versioned copy of the Flatcap 2.0 core (the only source of values).
 Output : the text between `flatcap:tokens:begin/end` in every styles/*.user.less (LESS mixins .fc-tokens-slate() and
-         .fc-tokens-daylight()), and the blocks between <!-- build:NAME --> markers in README.md.
+         .fc-tokens-daylight()), and the blocks between <!-- build:NAME --> markers in docs/mapping.md.
 
 Colours are assigned by role inside each style; this script never maps by palette position and no hex value is
 written by hand outside the generated block. Python 3.10+, standard library only. Output is deterministic.
@@ -26,7 +26,7 @@ ROOT = Path(__file__).resolve().parent.parent
 THEME = ROOT / "src" / "theme.json"
 CORE = (ROOT / ".." / "00-Flatcap").resolve()
 STYLES = sorted((ROOT / "styles").glob("*.user.less"))
-README = ROOT / "README.md"
+MAPPING_DOC = ROOT / "docs" / "mapping.md"
 MODES = ("slate", "daylight")
 BEGIN = "/* flatcap:tokens:begin"
 END = "/* flatcap:tokens:end */"
@@ -126,7 +126,7 @@ def used_roles(text: str) -> set[str]:
     return set(re.findall(r"@([a-z]+-[a-z0-9]+)(?![\w-])", after)) | set(re.findall(r"--fc-([a-z]+-[a-z0-9]+)", after))
 
 
-def readme_blocks(theme: dict) -> dict[str, str]:
+def doc_blocks(theme: dict) -> dict[str, str]:
     usage: dict[str, list[str]] = {}
     for p in STYLES:
         site = p.name.removesuffix(".user.less")
@@ -150,7 +150,7 @@ def sub_blocks(text: str, blocks: dict[str, str]) -> str:
     for name, body in blocks.items():
         pat = re.compile(rf"(<!-- build:{name} -->\n)(.*?)(\n<!-- /build:{name} -->)", re.S)
         if not pat.search(text):
-            sys.exit(f"README.md is missing the <!-- build:{name} --> block")
+            sys.exit(f"docs/mapping.md is missing the <!-- build:{name} --> block")
         text = pat.sub(lambda m: m.group(1) + body + m.group(3), text)
     return text
 
@@ -228,9 +228,9 @@ def main() -> int:
         return 1 if fails else 0
 
     want = expected(theme)
-    readme = README.read_text(encoding="utf-8") if README.exists() else ""
-    rb = readme_blocks(theme)
-    new_readme = sub_blocks(readme, rb) if readme else ""
+    doc = MAPPING_DOC.read_text(encoding="utf-8") if MAPPING_DOC.exists() else ""
+    rb = doc_blocks(theme)
+    new_doc = sub_blocks(doc, rb) if doc else ""
 
     if a.check:
         errs = []
@@ -240,8 +240,8 @@ def main() -> int:
                 errs.append(f"{p.relative_to(ROOT)}: generated block is stale (run scripts/build.py)")
             errs += [f"{p.name}: hex outside generated block -> {b}" for b in hex_outside(cur)]
             errs += meta_errors(cur, theme, p.name)
-        if readme and new_readme != readme:
-            errs.append("README.md: generated blocks are stale (run scripts/build.py)")
+        if doc and new_doc != doc:
+            errs.append("docs/mapping.md: generated blocks are stale (run scripts/build.py)")
         for mode, fg, bg, need, r, where in contrast_rows(theme):
             if r < need:
                 errs.append(f"contrast {mode} {fg} on {bg}: {r:.2f} < {need} ({where})")
@@ -255,9 +255,9 @@ def main() -> int:
 
     for p, txt in want.items():
         p.write_text(txt, encoding="utf-8")
-    if readme:
-        README.write_text(new_readme, encoding="utf-8")
-    print(f"wrote {len(want)} styles" + (" and README.md" if readme else ""))
+    if doc:
+        MAPPING_DOC.write_text(new_doc, encoding="utf-8")
+    print(f"wrote {len(want)} styles" + (" and docs/mapping.md" if doc else ""))
     return 0
 
 
